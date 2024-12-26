@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"slices"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/usememos/gomark/ast"
@@ -25,23 +24,7 @@ func NewRunner(store *store.Store) *Runner {
 	}
 }
 
-// Schedule runner every 12 hours.
-const runnerInterval = time.Hour * 12
-
-func (r *Runner) Run(ctx context.Context) {
-	ticker := time.NewTicker(runnerInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ticker.C:
-			r.RunOnce(ctx)
-		case <-ctx.Done():
-			return
-		}
-	}
-}
-
+// RunOnce rebuilds the payload of all memos.
 func (r *Runner) RunOnce(ctx context.Context) {
 	memos, err := r.Store.ListMemos(ctx, &store.FindMemo{})
 	if err != nil {
@@ -73,6 +56,7 @@ func RebuildMemoPayload(memo *store.Memo) error {
 		memo.Payload = &storepb.MemoPayload{}
 	}
 	tags := []string{}
+	references := []string{}
 	property := &storepb.MemoPayload_Property{}
 	TraverseASTNodes(nodes, func(node ast.Node) {
 		switch n := node.(type) {
@@ -90,9 +74,13 @@ func RebuildMemoPayload(memo *store.Memo) error {
 			}
 		case *ast.Code, *ast.CodeBlock:
 			property.HasCode = true
+		case *ast.EmbeddedContent:
+			// TODO: validate references.
+			references = append(references, n.ResourceName)
 		}
 	})
 	memo.Payload.Tags = tags
+	memo.Payload.References = references
 	memo.Payload.Property = property
 	return nil
 }
