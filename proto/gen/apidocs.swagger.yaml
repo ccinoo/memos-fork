@@ -311,12 +311,16 @@ paths:
           type: integer
           format: int32
         - name: pageToken
-          description: "A page token, received from a previous `ListMemos` call.\r\nProvide this to retrieve the subsequent page."
+          description: |-
+            A page token, received from a previous `ListMemos` call.
+            Provide this to retrieve the subsequent page.
           in: query
           required: false
           type: string
         - name: filter
-          description: "Filter is used to filter memos returned in the list.\r\nFormat: \"creator == 'users/{uid}' && visibilities == ['PUBLIC', 'PROTECTED']\""
+          description: |-
+            Filter is used to filter memos returned in the list.
+            Format: "creator == 'users/{uid}' && visibilities == ['PUBLIC', 'PROTECTED']"
           in: query
           required: false
           type: string
@@ -630,8 +634,6 @@ paths:
               updateTime:
                 type: string
                 format: date-time
-              rowStatus:
-                $ref: '#/definitions/v1RowStatus'
               name:
                 type: string
               url:
@@ -816,7 +818,10 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: memo.name
-          description: "The name of the memo.\r\nFormat: memos/{id}\r\nid is the system generated id."
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
+            id is the system generated id.
           in: path
           required: true
           type: string
@@ -830,11 +835,13 @@ paths:
               uid:
                 type: string
                 description: The user defined id of the memo.
-              rowStatus:
-                $ref: '#/definitions/v1RowStatus'
+              state:
+                $ref: '#/definitions/v1State'
               creator:
                 type: string
-                title: "The name of the creator.\r\nFormat: users/{id}"
+                title: |-
+                  The name of the creator.
+                  Format: users/{id}
               createTime:
                 type: string
                 format: date-time
@@ -882,7 +889,9 @@ paths:
                 readOnly: true
               parent:
                 type: string
-                title: "The name of the parent memo.\r\nFormat: memos/{id}"
+                title: |-
+                  The name of the parent memo.
+                  Format: memos/{id}
                 readOnly: true
               snippet:
                 type: string
@@ -1054,7 +1063,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name_4
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1076,7 +1087,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name_4
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1228,7 +1241,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1249,7 +1264,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1276,7 +1293,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1297,7 +1316,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1324,7 +1345,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1346,7 +1369,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1373,7 +1398,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1395,7 +1422,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: name
-          description: "The name of the memo.\r\nFormat: memos/{id}"
+          description: |-
+            The name of the memo.
+            Format: memos/{id}
           in: path
           required: true
           type: string
@@ -1447,7 +1476,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: parent
-          description: "The parent, who owns the tags.\r\nFormat: memos/{id}. Use \"memos/-\" to delete all tags."
+          description: |-
+            The parent, who owns the tags.
+            Format: memos/{id}. Use "memos/-" to delete all tags.
           in: path
           required: true
           type: string
@@ -1478,7 +1509,9 @@ paths:
             $ref: '#/definitions/googlerpcStatus'
       parameters:
         - name: parent
-          description: "The parent, who owns the tags.\r\nFormat: memos/{id}. Use \"memos/-\" to rename all tags."
+          description: |-
+            The parent, who owns the tags.
+            Format: memos/{id}. Use "memos/-" to rename all tags.
           in: path
           required: true
           type: string
@@ -1632,8 +1665,8 @@ paths:
                 type: string
               password:
                 type: string
-              rowStatus:
-                $ref: '#/definitions/v1RowStatus'
+              state:
+                $ref: '#/definitions/v1State'
               createTime:
                 type: string
                 format: date-time
@@ -1928,16 +1961,21 @@ definitions:
     properties:
       name:
         type: string
-        description: "The name of the memo.\r\nFormat: memos/{id}\r\nid is the system generated id."
+        description: |-
+          The name of the memo.
+          Format: memos/{id}
+          id is the system generated id.
         readOnly: true
       uid:
         type: string
         description: The user defined id of the memo.
-      rowStatus:
-        $ref: '#/definitions/v1RowStatus'
+      state:
+        $ref: '#/definitions/v1State'
       creator:
         type: string
-        title: "The name of the creator.\r\nFormat: users/{id}"
+        title: |-
+          The name of the creator.
+          Format: users/{id}
       createTime:
         type: string
         format: date-time
@@ -1985,7 +2023,9 @@ definitions:
         readOnly: true
       parent:
         type: string
-        title: "The name of the parent memo.\r\nFormat: memos/{id}"
+        title: |-
+          The name of the parent memo.
+          Format: memos/{id}
         readOnly: true
       snippet:
         type: string
@@ -2562,7 +2602,9 @@ definitions:
           $ref: '#/definitions/apiv1Memo'
       nextPageToken:
         type: string
-        description: "A token, which can be sent as `page_token` to retrieve the next page.\r\nIf this field is omitted, there are no subsequent pages."
+        description: |-
+          A token, which can be sent as `page_token` to retrieve the next page.
+          If this field is omitted, there are no subsequent pages.
   v1ListNode:
     type: object
     properties:
@@ -2825,7 +2867,9 @@ definitions:
         format: int32
       creator:
         type: string
-        title: "The name of the creator.\r\nFormat: users/{id}"
+        title: |-
+          The name of the creator.
+          Format: users/{id}
       contentId:
         type: string
       reactionType:
@@ -2883,13 +2927,6 @@ definitions:
     properties:
       markdown:
         type: string
-  v1RowStatus:
-    type: string
-    enum:
-      - ROW_STATUS_UNSPECIFIED
-      - ACTIVE
-      - ARCHIVED
-    default: ROW_STATUS_UNSPECIFIED
   v1SearchUsersResponse:
     type: object
     properties:
@@ -2903,6 +2940,13 @@ definitions:
     properties:
       content:
         type: string
+  v1State:
+    type: string
+    enum:
+      - STATE_UNSPECIFIED
+      - NORMAL
+      - ARCHIVED
+    default: STATE_UNSPECIFIED
   v1StrikethroughNode:
     type: object
     properties:
@@ -3012,8 +3056,8 @@ definitions:
         type: string
       password:
         type: string
-      rowStatus:
-        $ref: '#/definitions/v1RowStatus'
+      state:
+        $ref: '#/definitions/v1State'
       createTime:
         type: string
         format: date-time
@@ -3056,8 +3100,6 @@ definitions:
       updateTime:
         type: string
         format: date-time
-      rowStatus:
-        $ref: '#/definitions/v1RowStatus'
       name:
         type: string
       url:

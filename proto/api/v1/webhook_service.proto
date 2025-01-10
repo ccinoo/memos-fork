@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package memos.api.v1;
 
-import "api/v1/common.proto";
 import "api/v1/memo_service.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
@@ -53,11 +52,9 @@ message Webhook {
 
   google.protobuf.Timestamp update_time = 4;
 
-  RowStatus row_status = 5;
+  string name = 5;
 
-  string name = 6;
-
-  string url = 7;
+  string url = 6;
 }
 
 message CreateWebhookRequest {
