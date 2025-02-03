@@ -12,7 +12,7 @@ import (
 	"github.com/usememos/memos/plugin/filter"
 )
 
-func ConvertExprToSQL(ctx *filter.ConvertContext, expr *exprv1.Expr) error {
+func (d *DB) ConvertExprToSQL(ctx *filter.ConvertContext, expr *exprv1.Expr) error {
 	if v, ok := expr.ExprKind.(*exprv1.Expr_CallExpr); ok {
 		switch v.CallExpr.Function {
 		case "_||_", "_&&_":
@@ -22,7 +22,7 @@ func ConvertExprToSQL(ctx *filter.ConvertContext, expr *exprv1.Expr) error {
 			if _, err := ctx.Buffer.WriteString("("); err != nil {
 				return err
 			}
-			if err := ConvertExprToSQL(ctx, v.CallExpr.Args[0]); err != nil {
+			if err := d.ConvertExprToSQL(ctx, v.CallExpr.Args[0]); err != nil {
 				return err
 			}
 			operator := "AND"
@@ -32,7 +32,7 @@ func ConvertExprToSQL(ctx *filter.ConvertContext, expr *exprv1.Expr) error {
 			if _, err := ctx.Buffer.WriteString(fmt.Sprintf(" %s ", operator)); err != nil {
 				return err
 			}
-			if err := ConvertExprToSQL(ctx, v.CallExpr.Args[1]); err != nil {
+			if err := d.ConvertExprToSQL(ctx, v.CallExpr.Args[1]); err != nil {
 				return err
 			}
 			if _, err := ctx.Buffer.WriteString(")"); err != nil {
@@ -45,7 +45,7 @@ func ConvertExprToSQL(ctx *filter.ConvertContext, expr *exprv1.Expr) error {
 			if _, err := ctx.Buffer.WriteString("NOT ("); err != nil {
 				return err
 			}
-			if err := ConvertExprToSQL(ctx, v.CallExpr.Args[0]); err != nil {
+			if err := d.ConvertExprToSQL(ctx, v.CallExpr.Args[0]); err != nil {
 				return err
 			}
 			if _, err := ctx.Buffer.WriteString(")"); err != nil {
@@ -59,7 +59,7 @@ func ConvertExprToSQL(ctx *filter.ConvertContext, expr *exprv1.Expr) error {
 			if err != nil {
 				return err
 			}
-			if !slices.Contains([]string{"create_time", "update_time"}, identifier) {
+			if !slices.Contains([]string{"create_time", "update_time", "visibility", "content"}, identifier) {
 				return errors.Errorf("invalid identifier for %s", v.CallExpr.Function)
 			}
 			value, err := filter.GetConstValue(v.CallExpr.Args[1])
@@ -102,6 +102,25 @@ func ConvertExprToSQL(ctx *filter.ConvertContext, expr *exprv1.Expr) error {
 					return err
 				}
 				ctx.Args = append(ctx.Args, timestamp.Unix())
+			} else if identifier == "visibility" || identifier == "content" {
+				if operator != "=" && operator != "!=" {
+					return errors.Errorf("invalid operator for %s", v.CallExpr.Function)
+				}
+				valueStr, ok := value.(string)
+				if !ok {
+					return errors.New("invalid string value")
+				}
+
+				var factor string
+				if identifier == "visibility" {
+					factor = "`memo`.`visibility`"
+				} else if identifier == "content" {
+					factor = "`memo`.`content`"
+				}
+				if _, err := ctx.Buffer.WriteString(fmt.Sprintf("%s %s ?", factor, operator)); err != nil {
+					return err
+				}
+				ctx.Args = append(ctx.Args, valueStr)
 			}
 		case "@in":
 			if len(v.CallExpr.Args) != 2 {
