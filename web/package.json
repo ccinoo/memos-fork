@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^8.0.0",
+    "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -23,9 +23,9 @@
     "copy-to-clipboard": "^3.3.3",
     "dayjs": "^1.11.13",
     "emoji-regex": "^10.4.0",
-    "fuse.js": "^7.0.0",
+    "fuse.js": "^7.1.0",
     "highlight.js": "^11.11.1",
-    "i18next": "^24.2.0",
+    "i18next": "^24.2.2",
     "katex": "^0.16.19",
     "leaflet": "^1.9.4",
     "lodash-es": "^4.17.21",
@@ -51,7 +51,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.48.0",
+    "@bufbuild/buf": "^1.50.0",
     "@bufbuild/protobuf": "^2.2.3",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/d3": "^7.4.3",
@@ -79,6 +79,6 @@
     "prettier": "^3.4.2",
     "protobufjs": "^7.4.0",
     "typescript": "^5.7.3",
-    "vite": "^6.0.6"
+    "vite": "^6.2.0"
   }
 }
