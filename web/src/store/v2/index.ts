@@ -1,5 +1,7 @@
+import memoStore from "./memo";
+import resourceStore from "./resource";
 import userStore from "./user";
 import viewStore from "./view";
 import workspaceStore from "./workspace";
 
-export { workspaceStore, userStore, viewStore };
+export { memoStore, resourceStore, workspaceStore, userStore, viewStore };
