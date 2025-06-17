@@ -102,7 +102,7 @@ sh ./scripts/build.sh
 cd web && pnpm build
 
 # Protocol buffer generation
-buf generate
+cd proto && buf generate
 
 # Linting
 golangci-lint run --timeout=3m
@@ -215,23 +215,4 @@ FROM alpine:latest AS production
 1. **Lint Checking**: All linters must pass
 2. **Test Coverage**: New code should include tests
 3. **Documentation**: Update relevant documentation
-4. **AIP Compliance**: New APIs should follow AIP standards
-
-## Future Considerations
-
-### Planned Improvements
-
-- **Additional Service Tests**: Expand test coverage to all services
-- **API Versioning**: Support for multiple API versions
-- **Enhanced Metrics**: Better observability and monitoring
-- **Plugin System**: Extensible architecture for custom features
-
-### Technical Debt
-
-- **Legacy API Cleanup**: Remove deprecated endpoints
-- **Performance Optimization**: Database query optimization
-- **Security Hardening**: Enhanced security measures
-
----
-
-_This documentation reflects the current state of the Memos project as of June 2025, including recent AIP compliance refactoring and comprehensive testing infrastructure._
+4. **AIP Compliance**: New APIs should follow [AIP](https://google.aip.dev/) standards
