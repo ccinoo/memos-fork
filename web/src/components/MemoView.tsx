@@ -137,7 +137,6 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
     <div
       className={cn(
         "group relative flex flex-col justify-start items-start w-full px-4 py-3 mb-2 gap-2 bg-card text-card-foreground rounded-lg border border-border transition-colors",
-        "hover:bg-accent hover:text-accent-foreground hover:border-accent",
         className,
       )}
     >
@@ -146,7 +145,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
           {props.showCreator && creator ? (
             <div className="w-full flex flex-row justify-start items-center">
               <Link
-                className="w-auto hover:bg-accent hover:text-accent-foreground rounded-md p-1 transition-colors"
+                className="w-auto hover:opacity-80 rounded-md transition-colors"
                 to={`/u/${encodeURIComponent(creator.username)}`}
                 viewTransition
               >
@@ -154,14 +153,14 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
               </Link>
               <div className="w-full flex flex-col justify-center items-start">
                 <Link
-                  className="w-full block leading-tight hover:bg-accent hover:text-accent-foreground rounded-md px-2 py-1 transition-colors truncate text-muted-foreground"
+                  className="block leading-tight hover:opacity-80 rounded-md transition-colors truncate text-muted-foreground"
                   to={`/u/${encodeURIComponent(creator.username)}`}
                   viewTransition
                 >
                   {creator.displayName || creator.username}
                 </Link>
                 <div
-                  className="w-auto -mt-0.5 text-xs leading-tight text-muted-foreground select-none cursor-pointer hover:text-foreground transition-colors"
+                  className="w-auto -mt-0.5 text-xs leading-tight text-muted-foreground select-none cursor-pointer hover:opacity-80 transition-colors"
                   onClick={handleGotoMemoDetailPage}
                 >
                   {displayTime}
@@ -182,7 +181,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
             {props.showVisibility && memo.visibility !== Visibility.PRIVATE && (
               <Tooltip>
                 <TooltipTrigger>
-                  <span className="flex justify-center items-center hover:bg-accent hover:text-accent-foreground rounded-md p-1 transition-colors">
+                  <span className="flex justify-center items-center rounded-md p-1 hover:opacity-80">
                     <VisibilityIcon visibility={memo.visibility} />
                   </span>
                 </TooltipTrigger>
@@ -194,7 +193,7 @@ const MemoView: React.FC<Props> = observer((props: Props) => {
           {!isInMemoDetailPage && (workspaceMemoRelatedSetting.enableComment || commentAmount > 0) && (
             <Link
               className={cn(
-                "flex flex-row justify-start items-center hover:bg-accent hover:text-accent-foreground rounded-md p-1 transition-colors",
+                "flex flex-row justify-start items-center rounded-md p-1 hover:opacity-80",
                 commentAmount === 0 && "invisible group-hover:visible",
               )}
               to={`/${memo.name}#comments`}
