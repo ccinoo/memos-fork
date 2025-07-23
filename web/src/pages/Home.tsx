@@ -5,6 +5,7 @@ import MemoView from "@/components/MemoView";
 import PagedMemoList from "@/components/PagedMemoList";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { viewStore, userStore, workspaceStore } from "@/store";
+import { extractUserIdFromName } from "@/store/common";
 import memoFilterStore from "@/store/memoFilter";
 import { State } from "@/types/proto/api/v1/common";
 import { Memo } from "@/types/proto/api/v1/memo_service";
@@ -22,7 +23,7 @@ const Home = observer(() => {
   const selectedShortcut = userStore.state.shortcuts.find((shortcut) => getShortcutId(shortcut.name) === memoFilterStore.shortcut);
 
   const memoFilter = useMemo(() => {
-    const conditions = [];
+    const conditions = [`creator_id == ${extractUserIdFromName(user.name)}`];
     if (selectedShortcut?.filter) {
       conditions.push(selectedShortcut.filter);
     }
@@ -49,6 +50,7 @@ const Home = observer(() => {
         conditions.push(`${factor} >= ${timestampAfter} && ${factor} < ${timestampAfter + 60 * 60 * 24}`);
       }
     }
+    console.log("conditions", conditions);
     return conditions.length > 0 ? conditions.join(" && ") : undefined;
   }, [memoFilterStore.filters, selectedShortcut?.filter]);
 
@@ -65,7 +67,6 @@ const Home = observer(() => {
                 : dayjs(b.displayTime).unix() - dayjs(a.displayTime).unix(),
             )
         }
-        owner={user.name}
         orderBy={viewStore.state.orderByTimeAsc ? "display_time asc" : "display_time desc"}
         filter={memoFilter}
       />
