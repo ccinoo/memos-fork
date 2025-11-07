@@ -140,35 +140,46 @@ func (s *APIV1Service) GetUserAvatar(ctx context.Context, request *v1pb.GetUserA
 }
 
 func (s *APIV1Service) CreateUser(ctx context.Context, request *v1pb.CreateUserRequest) (*v1pb.User, error) {
-	// Check if there are any existing host users (for first-time setup detection)
-	hostUserType := store.RoleHost
-	existedHostUsers, err := s.Store.ListUsers(ctx, &store.FindUser{
-		Role: &hostUserType,
-	})
+	// Get current user (might be nil for unauthenticated requests)
+	currentUser, _ := s.GetCurrentUser(ctx)
+
+	// Check if there are any existing users (for first-time setup detection)
+	limitOne := 1
+	allUsers, err := s.Store.ListUsers(ctx, &store.FindUser{Limit: &limitOne})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to list host users: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to list users: %v", err)
+	}
+	isFirstUser := len(allUsers) == 0
+
+	// Check registration settings FIRST (unless it's the very first user)
+	if !isFirstUser {
+		// Only allow user registration if it is enabled in the settings, or if the user is a superuser
+		if currentUser == nil || !isSuperUser(currentUser) {
+			instanceGeneralSetting, err := s.Store.GetInstanceGeneralSetting(ctx)
+			if err != nil {
+				return nil, status.Errorf(codes.Internal, "failed to get instance general setting, error: %v", err)
+			}
+			if instanceGeneralSetting.DisallowUserRegistration {
+				return nil, status.Errorf(codes.PermissionDenied, "user registration is not allowed")
+			}
+		}
 	}
 
-	// Determine the role to assign and check permissions
+	// Determine the role to assign
 	var roleToAssign store.Role
-	if len(existedHostUsers) == 0 {
+	if isFirstUser {
 		// First-time setup: create the first user as HOST (no authentication required)
 		roleToAssign = store.RoleHost
-	} else {
-		// Regular user creation: allow unauthenticated creation of normal users
-		// But if authenticated, check if user has HOST permission for any role
-		currentUser, err := s.GetCurrentUser(ctx)
-		if err == nil && currentUser != nil && currentUser.Role == store.RoleHost {
-			// Authenticated HOST user can create users with any role specified in request
-			if request.User.Role != v1pb.User_ROLE_UNSPECIFIED {
-				roleToAssign = convertUserRoleToStore(request.User.Role)
-			} else {
-				roleToAssign = store.RoleUser
-			}
+	} else if currentUser != nil && currentUser.Role == store.RoleHost {
+		// Authenticated HOST user can create users with any role specified in request
+		if request.User.Role != v1pb.User_ROLE_UNSPECIFIED {
+			roleToAssign = convertUserRoleToStore(request.User.Role)
 		} else {
-			// Unauthenticated or non-HOST users can only create normal users
 			roleToAssign = store.RoleUser
 		}
+	} else {
+		// Unauthenticated or non-HOST users can only create normal users
+		roleToAssign = store.RoleUser
 	}
 
 	if !base.UIDMatcher.MatchString(strings.ToLower(request.User.Username)) {
