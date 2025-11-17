@@ -197,6 +197,12 @@ const MemoEditor = observer((props: Props) => {
 
     if (isMetaKey) {
       if (event.key === "Enter") {
+        event.preventDefault();
+        handleSaveBtnClick();
+        return;
+      }
+      if (event.key.toLowerCase() === "s") {
+        event.preventDefault();
         handleSaveBtnClick();
         return;
       }
@@ -591,6 +597,7 @@ const MemoEditor = observer((props: Props) => {
                   location,
                 }))
               }
+              onToggleFocusMode={toggleFocusMode}
             />
           </div>
           <div className="shrink-0 flex flex-row justify-end items-center">
