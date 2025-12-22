@@ -183,6 +183,7 @@ const InsertMenu = observer((props: Props) => {
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
+          <div className="px-2 py-1 text-xs text-muted-foreground opacity-80">{t("editor.slash-commands")}</div>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -213,8 +214,7 @@ const InsertMenu = observer((props: Props) => {
         state={location.state}
         locationInitialized={location.locationInitialized}
         onPositionChange={handlePositionChange}
-        onLatChange={location.handleLatChange}
-        onLngChange={location.handleLngChange}
+        onUpdateCoordinate={location.updateCoordinate}
         onPlaceholderChange={location.setPlaceholder}
         onCancel={handleLocationCancel}
         onConfirm={handleLocationConfirm}
