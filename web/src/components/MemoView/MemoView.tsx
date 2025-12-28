@@ -1,32 +1,13 @@
 import { memo, useMemo, useRef, useState } from "react";
+import { useUser } from "@/hooks/useUserQueries";
 import { cn } from "@/lib/utils";
-import type { Memo } from "@/types/proto/api/v1/memo_service_pb";
 import MemoEditor from "../MemoEditor";
 import PreviewImageDialog from "../PreviewImageDialog";
 import { MemoBody, MemoHeader } from "./components";
 import { MEMO_CARD_BASE_CLASSES } from "./constants";
-import {
-  useImagePreview,
-  useKeyboardShortcuts,
-  useMemoActions,
-  useMemoCreator,
-  useMemoEditor,
-  useMemoHandlers,
-  useMemoViewDerivedState,
-  useNsfwContent,
-} from "./hooks";
+import { useImagePreview, useKeyboardShortcuts, useMemoActions, useMemoHandlers, useMemoViewDerivedState, useNsfwContent } from "./hooks";
 import { MemoViewContext } from "./MemoViewContext";
-
-interface Props {
-  memo: Memo;
-  compact?: boolean;
-  showCreator?: boolean;
-  showVisibility?: boolean;
-  showPinned?: boolean;
-  showNsfwContent?: boolean;
-  className?: string;
-  parentPage?: string;
-}
+import type { MemoViewProps } from "./types";
 
 /**
  * MemoView component displays a memo card with all its content, metadata, and interactive elements.
@@ -49,20 +30,22 @@ interface Props {
  * />
  * ```
  */
-const MemoView: React.FC<Props> = (props: Props) => {
+const MemoView: React.FC<MemoViewProps> = (props: MemoViewProps) => {
   const { memo: memoData, className } = props;
   const cardRef = useRef<HTMLDivElement>(null);
   const [reactionSelectorOpen, setReactionSelectorOpen] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
 
-  const creator = useMemoCreator(memoData.creator);
-  const { commentAmount, relativeTimeFormat, isArchived, readonly, isInMemoDetailPage, parentPage } = useMemoViewDerivedState(
-    memoData,
-    props.parentPage,
-  );
+  const creator = useUser(memoData.creator).data;
+  const { isArchived, readonly, parentPage } = useMemoViewDerivedState(memoData, props.parentPage);
   const { nsfw, showNSFWContent, toggleNsfwVisibility } = useNsfwContent(memoData, props.showNsfwContent);
   const { previewState, openPreview, setPreviewOpen } = useImagePreview();
-  const { showEditor, openEditor, handleEditorConfirm, handleEditorCancel } = useMemoEditor();
-  const { archiveMemo, unpinMemo } = useMemoActions(memoData);
+  const { archiveMemo, unpinMemo } = useMemoActions(memoData, isArchived);
+
+  const handleEditorConfirm = () => setShowEditor(false);
+  const handleEditorCancel = () => setShowEditor(false);
+  const openEditor = () => setShowEditor(true);
+
   const { handleGotoMemoDetailPage, handleMemoContentClick, handleMemoContentDoubleClick } = useMemoHandlers({
     memoName: memoData.name,
     parentPage,
@@ -79,37 +62,15 @@ const MemoView: React.FC<Props> = (props: Props) => {
     onArchive: archiveMemo,
   });
 
-  // Memoize static values that rarely change
-  const staticContextValue = useMemo(
+  const contextValue = useMemo(
     () => ({
       memo: memoData,
       creator,
-      isArchived,
-      readonly,
-      isInMemoDetailPage,
       parentPage,
-    }),
-    [memoData, creator, isArchived, readonly, isInMemoDetailPage, parentPage],
-  );
-
-  // Memoize dynamic values separately
-  const dynamicContextValue = useMemo(
-    () => ({
-      commentAmount,
-      relativeTimeFormat,
-      nsfw,
       showNSFWContent,
+      nsfw,
     }),
-    [commentAmount, relativeTimeFormat, nsfw, showNSFWContent],
-  );
-
-  // Combine context values
-  const contextValue = useMemo(
-    () => ({
-      ...staticContextValue,
-      ...dynamicContextValue,
-    }),
-    [staticContextValue, dynamicContextValue],
+    [memoData, creator, parentPage, showNSFWContent, nsfw],
   );
 
   if (showEditor) {
