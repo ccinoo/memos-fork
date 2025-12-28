@@ -1,4 +1,5 @@
-import { ArrowUpIcon, LoaderIcon } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowUpIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { matchPath } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { userServiceClient } from "@/connect";
 import { useView } from "@/contexts/ViewContext";
 import { DEFAULT_LIST_MEMOS_PAGE_SIZE } from "@/helpers/consts";
 import { useInfiniteMemos } from "@/hooks/useMemoQueries";
+import { userKeys } from "@/hooks/useUserQueries";
 import { Routes } from "@/router";
 import { State } from "@/types/proto/api/v1/common_pb";
 import type { Memo } from "@/types/proto/api/v1/memo_service_pb";
@@ -15,7 +17,7 @@ import type { MemoRenderContext } from "../MasonryView";
 import MasonryView from "../MasonryView";
 import MemoEditor from "../MemoEditor";
 import MemoFilters from "../MemoFilters";
-import MemoSkeleton from "../MemoSkeleton";
+import Skeleton from "../Skeleton";
 
 interface Props {
   renderer: (memo: Memo, context?: MemoRenderContext) => JSX.Element;
@@ -81,6 +83,7 @@ function useAutoFetchWhenNotScrollable({
 const PagedMemoList = (props: Props) => {
   const t = useTranslate();
   const { layout } = useView();
+  const queryClient = useQueryClient();
 
   // Show memo editor only on the root route
   const showMemoEditor = Boolean(matchPath(Routes.ROOT, window.location.pathname));
@@ -99,7 +102,7 @@ const PagedMemoList = (props: Props) => {
   // Apply custom sorting if provided, otherwise use memos directly
   const sortedMemoList = useMemo(() => (props.listSort ? props.listSort(memos) : memos), [memos, props.listSort]);
 
-  // Batch-fetch creators when new data arrives to improve performance
+  // Prefetch creators when new data arrives to improve performance
   useEffect(() => {
     if (!data?.pages || !props.showCreator) return;
 
@@ -107,14 +110,17 @@ const PagedMemoList = (props: Props) => {
     if (!lastPage?.memos) return;
 
     const uniqueCreators = Array.from(new Set(lastPage.memos.map((memo) => memo.creator)));
-    void Promise.allSettled(
-      uniqueCreators.map((creator) =>
-        userServiceClient.getUser({ name: creator }).catch(() => {
-          /* silently ignore errors */
-        }),
-      ),
-    );
-  }, [data?.pages, props.showCreator]);
+    for (const creator of uniqueCreators) {
+      void queryClient.prefetchQuery({
+        queryKey: userKeys.detail(creator),
+        queryFn: async () => {
+          const user = await userServiceClient.getUser({ name: creator });
+          return user;
+        },
+        staleTime: 1000 * 60 * 5,
+      });
+    }
+  }, [data?.pages, props.showCreator, queryClient]);
 
   // Auto-fetch hook: fetches more content when page isn't scrollable
   useAutoFetchWhenNotScrollable({
@@ -143,9 +149,7 @@ const PagedMemoList = (props: Props) => {
     <div className="flex flex-col justify-start items-start w-full max-w-full">
       {/* Show skeleton loader during initial load */}
       {isLoading ? (
-        <div className="w-full flex flex-col justify-start items-center">
-          <MemoSkeleton showCreator={props.showCreator} count={4} />
-        </div>
+        <Skeleton type="memo" showCreator={props.showCreator} count={4} />
       ) : (
         <>
           <MasonryView
@@ -162,12 +166,8 @@ const PagedMemoList = (props: Props) => {
             listMode={layout === "LIST"}
           />
 
-          {/* Loading indicator for pagination */}
-          {isFetchingNextPage && (
-            <div className="w-full flex flex-row justify-center items-center my-4">
-              <LoaderIcon className="animate-spin text-muted-foreground" />
-            </div>
-          )}
+          {/* Loading indicator for pagination - use skeleton for content consistency */}
+          {isFetchingNextPage && <Skeleton type="pagination" showCreator={props.showCreator} count={2} />}
 
           {/* Empty state or back-to-top button */}
           {!isFetchingNextPage && (
