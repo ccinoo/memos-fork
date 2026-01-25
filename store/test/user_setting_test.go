@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -12,6 +13,7 @@ import (
 )
 
 func TestUserSettingStore(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -29,6 +31,7 @@ func TestUserSettingStore(t *testing.T) {
 }
 
 func TestUserSettingGetByUserID(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -63,6 +66,7 @@ func TestUserSettingGetByUserID(t *testing.T) {
 }
 
 func TestUserSettingUpsertUpdate(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -101,6 +105,7 @@ func TestUserSettingUpsertUpdate(t *testing.T) {
 }
 
 func TestUserSettingRefreshTokens(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -161,6 +166,7 @@ func TestUserSettingRefreshTokens(t *testing.T) {
 }
 
 func TestUserSettingPersonalAccessTokens(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -212,6 +218,7 @@ func TestUserSettingPersonalAccessTokens(t *testing.T) {
 }
 
 func TestUserSettingWebhooks(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -278,6 +285,7 @@ func TestUserSettingWebhooks(t *testing.T) {
 }
 
 func TestUserSettingShortcuts(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -311,6 +319,7 @@ func TestUserSettingShortcuts(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHash(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -341,6 +350,7 @@ func TestUserSettingGetUserByPATHash(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHashNotFound(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	_, err := createTestingHostUser(ctx, ts)
@@ -355,6 +365,7 @@ func TestUserSettingGetUserByPATHashNotFound(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHashMultipleUsers(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user1, err := createTestingHostUser(ctx, ts)
@@ -395,6 +406,7 @@ func TestUserSettingGetUserByPATHashMultipleUsers(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHashMultiplePATsSameUser(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -432,6 +444,7 @@ func TestUserSettingGetUserByPATHashMultiplePATsSameUser(t *testing.T) {
 }
 
 func TestUserSettingUpdatePATLastUsed(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -461,6 +474,7 @@ func TestUserSettingUpdatePATLastUsed(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHashWithExpiredToken(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -489,6 +503,7 @@ func TestUserSettingGetUserByPATHashWithExpiredToken(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHashAfterRemoval(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -521,6 +536,7 @@ func TestUserSettingGetUserByPATHashAfterRemoval(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHashSpecialCharacters(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -555,6 +571,7 @@ func TestUserSettingGetUserByPATHashSpecialCharacters(t *testing.T) {
 }
 
 func TestUserSettingGetUserByPATHashLargeTokenCount(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -586,6 +603,7 @@ func TestUserSettingGetUserByPATHashLargeTokenCount(t *testing.T) {
 }
 
 func TestUserSettingMultipleSettingTypes(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	ts := NewTestingStore(ctx, t)
 	user, err := createTestingHostUser(ctx, ts)
@@ -635,6 +653,223 @@ func TestUserSettingMultipleSettingTypes(t *testing.T) {
 	patsSetting, err := ts.GetUserSetting(ctx, &store.FindUserSetting{UserID: &user.ID, Key: storepb.UserSetting_PERSONAL_ACCESS_TOKENS})
 	require.NoError(t, err)
 	require.Len(t, patsSetting.GetPersonalAccessTokens().Tokens, 1)
+
+	ts.Close()
+}
+
+func TestUserSettingShortcutsEdgeCases(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ts := NewTestingStore(ctx, t)
+	user, err := createTestingHostUser(ctx, ts)
+	require.NoError(t, err)
+
+	// Case 1: Special characters in Filter and Title
+	// Includes quotes, backslashes, newlines, and other JSON-sensitive characters
+	specialCharsFilter := `tag in ["work", "project"] && content.contains("urgent")`
+	specialCharsTitle := `Work "Urgent" \ Notes`
+	shortcuts := &storepb.ShortcutsUserSetting{
+		Shortcuts: []*storepb.ShortcutsUserSetting_Shortcut{
+			{Id: "s1", Title: specialCharsTitle, Filter: specialCharsFilter},
+		},
+	}
+	_, err = ts.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+		Value:  &storepb.UserSetting_Shortcuts{Shortcuts: shortcuts},
+	})
+	require.NoError(t, err)
+
+	setting, err := ts.GetUserSetting(ctx, &store.FindUserSetting{
+		UserID: &user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, setting)
+	require.Len(t, setting.GetShortcuts().Shortcuts, 1)
+	require.Equal(t, specialCharsTitle, setting.GetShortcuts().Shortcuts[0].Title)
+	require.Equal(t, specialCharsFilter, setting.GetShortcuts().Shortcuts[0].Filter)
+
+	// Case 2: Unicode characters
+	unicodeFilter := `tag in ["你好", "世界"]`
+	unicodeTitle := `My 🚀 Shortcuts`
+	shortcuts = &storepb.ShortcutsUserSetting{
+		Shortcuts: []*storepb.ShortcutsUserSetting_Shortcut{
+			{Id: "s2", Title: unicodeTitle, Filter: unicodeFilter},
+		},
+	}
+	_, err = ts.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+		Value:  &storepb.UserSetting_Shortcuts{Shortcuts: shortcuts},
+	})
+	require.NoError(t, err)
+
+	setting, err = ts.GetUserSetting(ctx, &store.FindUserSetting{
+		UserID: &user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, setting)
+	require.Len(t, setting.GetShortcuts().Shortcuts, 1)
+	require.Equal(t, unicodeTitle, setting.GetShortcuts().Shortcuts[0].Title)
+	require.Equal(t, unicodeFilter, setting.GetShortcuts().Shortcuts[0].Filter)
+
+	// Case 3: Empty shortcuts list
+	// Should allow saving an empty list (clearing shortcuts)
+	shortcuts = &storepb.ShortcutsUserSetting{
+		Shortcuts: []*storepb.ShortcutsUserSetting_Shortcut{},
+	}
+	_, err = ts.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+		Value:  &storepb.UserSetting_Shortcuts{Shortcuts: shortcuts},
+	})
+	require.NoError(t, err)
+
+	setting, err = ts.GetUserSetting(ctx, &store.FindUserSetting{
+		UserID: &user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, setting)
+	require.NotNil(t, setting.GetShortcuts())
+	require.Len(t, setting.GetShortcuts().Shortcuts, 0)
+
+	// Case 4: Large filter string
+	// Test reasonable large string handling (e.g. 4KB)
+	largeFilter := strings.Repeat("tag:long_tag_name ", 200)
+	shortcuts = &storepb.ShortcutsUserSetting{
+		Shortcuts: []*storepb.ShortcutsUserSetting_Shortcut{
+			{Id: "s3", Title: "Large Filter", Filter: largeFilter},
+		},
+	}
+	_, err = ts.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+		Value:  &storepb.UserSetting_Shortcuts{Shortcuts: shortcuts},
+	})
+	require.NoError(t, err)
+
+	setting, err = ts.GetUserSetting(ctx, &store.FindUserSetting{
+		UserID: &user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, setting)
+	require.Equal(t, largeFilter, setting.GetShortcuts().Shortcuts[0].Filter)
+
+	ts.Close()
+}
+
+func TestUserSettingShortcutsPartialUpdate(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ts := NewTestingStore(ctx, t)
+	user, err := createTestingHostUser(ctx, ts)
+	require.NoError(t, err)
+
+	// Initial set
+	shortcuts := &storepb.ShortcutsUserSetting{
+		Shortcuts: []*storepb.ShortcutsUserSetting_Shortcut{
+			{Id: "s1", Title: "Note 1", Filter: "tag:1"},
+			{Id: "s2", Title: "Note 2", Filter: "tag:2"},
+		},
+	}
+	_, err = ts.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+		Value:  &storepb.UserSetting_Shortcuts{Shortcuts: shortcuts},
+	})
+	require.NoError(t, err)
+
+	// Update by replacing the whole list (Store Upsert replaces the value for the key)
+	// We want to verify that we can "update" a single item by sending the modified list
+	updatedShortcuts := &storepb.ShortcutsUserSetting{
+		Shortcuts: []*storepb.ShortcutsUserSetting_Shortcut{
+			{Id: "s1", Title: "Note 1 Updated", Filter: "tag:1_updated"},
+			{Id: "s2", Title: "Note 2", Filter: "tag:2"},
+			{Id: "s3", Title: "Note 3", Filter: "tag:3"}, // Add new one
+		},
+	}
+	_, err = ts.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+		Value:  &storepb.UserSetting_Shortcuts{Shortcuts: updatedShortcuts},
+	})
+	require.NoError(t, err)
+
+	setting, err := ts.GetUserSetting(ctx, &store.FindUserSetting{
+		UserID: &user.ID,
+		Key:    storepb.UserSetting_SHORTCUTS,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, setting)
+	require.Len(t, setting.GetShortcuts().Shortcuts, 3)
+
+	// Verify updates
+	for _, s := range setting.GetShortcuts().Shortcuts {
+		if s.Id == "s1" {
+			require.Equal(t, "Note 1 Updated", s.Title)
+			require.Equal(t, "tag:1_updated", s.Filter)
+		} else if s.Id == "s2" {
+			require.Equal(t, "Note 2", s.Title)
+		} else if s.Id == "s3" {
+			require.Equal(t, "Note 3", s.Title)
+		}
+	}
+
+	ts.Close()
+}
+
+func TestUserSettingJSONFieldsEdgeCases(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	ts := NewTestingStore(ctx, t)
+	user, err := createTestingHostUser(ctx, ts)
+	require.NoError(t, err)
+
+	// Case 1: Webhook with special characters and Unicode in Title and URL
+	specialWebhook := &storepb.WebhooksUserSetting_Webhook{
+		Id:    "wh-special",
+		Title: `My "Special" & <Webhook> 🚀`,
+		Url:   "https://example.com/hook?query=你好&param=\"value\"",
+	}
+	err = ts.AddUserWebhook(ctx, user.ID, specialWebhook)
+	require.NoError(t, err)
+
+	webhooks, err := ts.GetUserWebhooks(ctx, user.ID)
+	require.NoError(t, err)
+	require.Len(t, webhooks, 1)
+	require.Equal(t, specialWebhook.Title, webhooks[0].Title)
+	require.Equal(t, specialWebhook.Url, webhooks[0].Url)
+
+	// Case 2: PAT with special description
+	specialPAT := &storepb.PersonalAccessTokensUserSetting_PersonalAccessToken{
+		TokenId:     "pat-special",
+		TokenHash:   "hash-special",
+		Description: "Token for 'CLI' \n & \"API\" \t with unicode 🔑",
+	}
+	err = ts.AddUserPersonalAccessToken(ctx, user.ID, specialPAT)
+	require.NoError(t, err)
+
+	pats, err := ts.GetUserPersonalAccessTokens(ctx, user.ID)
+	require.NoError(t, err)
+	require.Len(t, pats, 1)
+	require.Equal(t, specialPAT.Description, pats[0].Description)
+
+	// Case 3: Refresh Token with special description
+	specialRefreshToken := &storepb.RefreshTokensUserSetting_RefreshToken{
+		TokenId:     "rt-special",
+		Description: "Browser: Firefox (Nightly) / OS: Linux 🐧",
+	}
+	err = ts.AddUserRefreshToken(ctx, user.ID, specialRefreshToken)
+	require.NoError(t, err)
+
+	tokens, err := ts.GetUserRefreshTokens(ctx, user.ID)
+	require.NoError(t, err)
+	require.Len(t, tokens, 1)
+	require.Equal(t, specialRefreshToken.Description, tokens[0].Description)
 
 	ts.Close()
 }
