@@ -18,6 +18,7 @@ import (
 	storepb "github.com/usememos/memos/proto/gen/store"
 	apiv1 "github.com/usememos/memos/server/router/api/v1"
 	"github.com/usememos/memos/server/router/fileserver"
+	mcprouter "github.com/usememos/memos/server/router/mcp"
 	"github.com/usememos/memos/server/router/frontend"
 	"github.com/usememos/memos/server/router/rss"
 	"github.com/usememos/memos/server/runner/s3presign"
@@ -78,6 +79,10 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	if err := apiV1Service.RegisterGateway(ctx, echoServer); err != nil {
 		return nil, errors.Wrap(err, "failed to register gRPC gateway")
 	}
+
+	// Register MCP server.
+	mcpService := mcprouter.NewMCPService(s.Store)
+	mcpService.RegisterRoutes(echoServer)
 
 	return s, nil
 }
